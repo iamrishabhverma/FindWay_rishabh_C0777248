@@ -8,7 +8,7 @@
 import UIKit
 import MapKit
 import CoreLocation
-class ViewController: UIViewController ,CLLocationManagerDelegate{
+class ViewController: UIViewController ,CLLocationManagerDelegate,MKMapViewDelegate{
 
     @IBOutlet weak var findmyway: UIButton!
     @IBOutlet weak var mapView: MKMapView!
@@ -89,6 +89,7 @@ class ViewController: UIViewController ,CLLocationManagerDelegate{
         annotation.title = "Destination"
         annotation.coordinate = coordinate
         mapView.addAnnotation(annotation)
+        destination = coordinate
     }
     
    @objc func handlePinch(sender: UIPinchGestureRecognizer) {
@@ -140,25 +141,7 @@ class ViewController: UIViewController ,CLLocationManagerDelegate{
            
        }
         
-        extension ViewController: MKMapViewDelegate {
-            //MARK: - add viewFor annotation method
-            func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-                
-                if annotation is MKUserLocation {
-                    return nil
-                }
-                
-        //        let pinAnnotation = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
-        //        pinAnnotation.animatesDrop = true
-        //        pinAnnotation.pinTintColor = #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)
-                
-                // add custom annotation with image
-                let pinAnnotation = mapView.dequeueReusableAnnotationView(withIdentifier: "droppablePin") ?? MKPinAnnotationView()
-                pinAnnotation.image = UIImage(named: "ic_place_2x")
-                pinAnnotation.canShowCallout = true
-                pinAnnotation.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-                return pinAnnotation
-            }
+       
         //MARK: - places method
         /// add places function
         func addPlaces() {
@@ -184,5 +167,5 @@ class ViewController: UIViewController ,CLLocationManagerDelegate{
         
 }
     
-}
-}
+
+           }
