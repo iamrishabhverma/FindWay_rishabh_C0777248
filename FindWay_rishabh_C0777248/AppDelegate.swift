@@ -1,9 +1,9 @@
 //
 //  AppDelegate.swift
-//  FindWay_Charmi_C0768448
+//  FindWay_rishabh_C0777248
 //
-//  Created by user174608 on 6/12/20.
-//  Copyright © 2020 charmi. All rights reserved.
+//  Created by Rishabh Verma on 2020-06-10.
+//  Copyright © 2020 Rishabh Verma. All rights reserved.
 //
 import UIKit
 
