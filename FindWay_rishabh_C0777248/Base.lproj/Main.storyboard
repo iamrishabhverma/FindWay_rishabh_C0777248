@@ -27,7 +27,7 @@
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="42" scale="large" weight="bold"/>
                                 </state>
                                 <connections>
-                                    <action selector="findmyway:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JI6-ec-mQd"/>
+                                    <action selector="drawDirection:" destination="BYZ-38-t0r" eventType="touchUpInside" id="4u9-MS-zdt"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="FindMyWay" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gYD-0o-sFd">
@@ -44,8 +44,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="findmyway" destination="Y01-Ld-vFZ" id="7dL-sC-mQs"/>
-                        <outlet property="mapView" destination="Dnl-AL-RTy" id="OcE-FM-T93"/>
+                        <outlet property="map" destination="Dnl-AL-RTy" id="oMf-bN-ymn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
