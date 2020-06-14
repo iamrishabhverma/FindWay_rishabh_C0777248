@@ -7,165 +7,245 @@
 //
 import UIKit
 import MapKit
-import CoreLocation
-class ViewController: UIViewController ,CLLocationManagerDelegate,MKMapViewDelegate{
 
-    @IBOutlet weak var findmyway: UIButton!
-    @IBOutlet weak var mapView: MKMapView!
+class ViewController: UIViewController , CLLocationManagerDelegate {
+    
     var locationManager = CLLocationManager()
+    
     var destination: CLLocationCoordinate2D!
+
+    @IBOutlet weak var map: MKMapView!
+    
     // create a places array
     let places = Place.getPlaces()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-
-                mapView.delegate = self
-                
-        //        this line is equivalent to the user location check box in map view
-        //        map.showsUserLocation = true
-                
-                // we give the delegate of locationManager to this class
-                locationManager.delegate = self
-                
-                // accuracy of the location
-                locationManager.desiredAccuracy = kCLLocationAccuracyBest
-                
-                // request the user for the location access
-                locationManager.requestWhenInUseAuthorization()
-                
-                // start updating the location of the user
-                locationManager.startUpdatingLocation()
         
-        // define latitude and longitude
-        let latitude: CLLocationDegrees = 30.959960
-        let longitude: CLLocationDegrees = -81.721930
+        map.delegate = self
         
-        // define delta latitude and longitude
+//        this line is equivalent to the user location check box in map view
+//        map.showsUserLocation = true
+        
+        // we give the delegate of locationManager to this class
+        locationManager.delegate = self
+        
+        // accuracy of the location
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        // request the user for the location access
+        locationManager.requestWhenInUseAuthorization()
+        
+        // start updating the location of the user
+        locationManager.startUpdatingLocation()
+ 
+        // 1 - define latitude and longitude
+        let latitude: CLLocationDegrees = 43.64
+        let longitude: CLLocationDegrees = -79.38
+        
+//        displayLocation(latitude: latitude, longitude: longitude, title: "Toronto Downtown", subtitle: "beatiful city")
+        
+        // long press gesture
+        let uilpgr = UILongPressGestureRecognizer(target: self, action: #selector(addlongPressAnnotation))
+        map.addGestureRecognizer(uilpgr)
+        
+        // add double tap
+        addDoubleTap()
+        
+        // add annotation for the places
+//        addPlaces()
+        
+        // add polyline method
+//        addPolyline()
+        
+        // add polygon method
+//        addPolygon()
+        
+    }
+    
+    //MARK: - places method
+    /// add places function
+    func addPlaces() {
+        map.addAnnotations(places)
+        
+        let overlays = places.map { MKCircle(center: $0.coordinate, radius: 1000)}
+        map.addOverlays(overlays)
+    }
+    
+    //MARK: - polyline method
+    func addPolyline() {
+        let coordinates = places.map {$0.coordinate}
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        map.addOverlay(polyline)
+    }
+    
+    //MARK: - polygon method
+    func addPolygon() {
+        let coordinates = places.map {$0.coordinate}
+        let polyline = MKPolygon(coordinates: coordinates, count: coordinates.count)
+        map.addOverlay(polyline)
+    }
+    
+    //MARK: - long press gesture recognizer for the annotation
+    @objc func addlongPressAnnotation(gestureRecognizer: UIGestureRecognizer) {
+        let touchPoint = gestureRecognizer.location(in: map)
+        let coordinate = map.convert(touchPoint, toCoordinateFrom: map)
+        
+        // add annotation
+        let annotation = MKPointAnnotation()
+        annotation.title = "My destination"
+        annotation.coordinate = coordinate
+        map.addAnnotation(annotation)
+    }
+    
+    
+    //MARK: - didupdatelocation method
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let userLocation = locations[0]
+        
+        let latitude = userLocation.coordinate.latitude
+        let longitude = userLocation.coordinate.longitude
+        
+        displayLocation(latitude: latitude, longitude: longitude, title: "Your Location", subtitle: "you are here")
+        
+        
+    }
+    
+    //MARK: - display user location method
+    func displayLocation(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String, subtitle: String) {
+        // 2 - define delta latitude and delta longitude for the span
         let latDelta: CLLocationDegrees = 0.05
-        let longDelta: CLLocationDegrees = 0.05
+        let lngDelta: CLLocationDegrees = 0.05
         
-        // define span
-        let span = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta)
-        
-        // define location
+        // 3 - creating the span and location coordinate and finally the region
+        let span = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
         let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        
-        // define the region
         let region = MKCoordinateRegion(center: location, span: span)
         
-        // set the region on the map
-        mapView.setRegion(region, animated: true)
-        
-        // adding annotation for the map
+        // 4 - set region for the map
+        map.setRegion(region, animated: true)
+        /*
+        // add annotation
         let annotation = MKPointAnnotation()
-        annotation.title = "You're here!"
+        annotation.title = title
+        annotation.subtitle = subtitle
         annotation.coordinate = location
-        mapView.addAnnotation(annotation)
-        
-        // add double tap gesture
-       
-        let tap = UITapGestureRecognizer(target: self, action: #selector(doubletapped))
-        tap.numberOfTapsRequired = 2
-        view.addGestureRecognizer(tap)
-        
-        // add trople tap to remove the pin
-        let tap2 = UITapGestureRecognizer(target: self, action: #selector(remove))
-        tap2.numberOfTapsRequired = 3
-        view.addGestureRecognizer(tap2)
-        
-        //add pinchto zoom gesture
-         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(sender:)))
-              view.addGestureRecognizer(pinch)
+        map.addAnnotation(annotation)
+ */
     }
     
-   
-   
-    @objc func doubletapped(gestureRecognizer: UIGestureRecognizer) {
-        let touchPoint = gestureRecognizer.location(in: mapView)
-        let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+    //MARK: - double tap func
+    func addDoubleTap() {
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(dropPin))
+        doubleTap.numberOfTapsRequired = 2
+        map.addGestureRecognizer(doubleTap)
+    }
+    
+    @objc func dropPin(sender: UITapGestureRecognizer) {
+        removePin()
         
+        // add annotation
+        
+        let touchPoint = sender.location(in: map)
+        let coordinate = map.convert(touchPoint, toCoordinateFrom: map)
         let annotation = MKPointAnnotation()
-        annotation.title = "Destination"
+        annotation.title = "My destination"
         annotation.coordinate = coordinate
-        mapView.addAnnotation(annotation)
-        destination = coordinate
+        map.addAnnotation(annotation)
+        
+       destination = coordinate
     }
     
-   @objc func handlePinch(sender: UIPinchGestureRecognizer) {
-          guard sender.view != nil else { return }
-          
-          if sender.state == .began || sender.state == .changed {
-              sender.view?.transform = (sender.view?.transform.scaledBy(x: sender.scale, y: sender.scale))!
-              sender.scale = 1.0
-          }
+    func removePin() {
+        for annotation in map.annotations {
+            map.removeAnnotation(annotation)
+        }
+//        map.removeAnnotations(map.annotations)
     }
-   
-    @objc func remove(gestureRecognizer: UIGestureRecognizer) {
-       for annotation in mapView.annotations {
-                    mapView.removeAnnotation(annotation)
-                }
-            mapView.removeAnnotations(mapView.annotations)
-    }
-    @IBAction func findmyway(_ sender: UIButton) {
-           //onclick find my way
-           
-           mapView.removeOverlays(mapView.overlays)
-                  
-                   let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate ,addressDictionary: nil)
-                   let destinationPlaceMark = MKPlacemark(coordinate: destination)
-                
-                   // request a direction
-                   let directionRequest = MKDirections.Request()
-                   
-                   // define source and destination
-                   directionRequest.source = MKMapItem(placemark: sourcePlaceMark)
-                   directionRequest.destination = MKMapItem(placemark: destinationPlaceMark)
-                   
-                   // transportation type
-                   directionRequest.transportType = .walking
-                   
-                   // calculate directions
-                   let directions = MKDirections(request: directionRequest)
-                   directions.calculate { (response, error) in
-                       guard let directionResponse = response else {return}
-                       // create route
-                       let route = directionResponse.routes[0]
-                       // draw the polyline
-                       self.mapView.addOverlay(route.polyline, level: .aboveRoads)
-                       
-                       // defining the bounding map rect
-                       let rect = route.polyline.boundingMapRect
-           //            self.map.setRegion(MKCoordinateRegion(rect), animated: true)
-                       self.mapView.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
-           
-       }
+    
+    @IBAction func drawDirection(_ sender: UIButton) {
+        map.removeOverlays(map.overlays)
         
-       
-        //MARK: - places method
-        /// add places function
-        func addPlaces() {
-            mapView.addAnnotations(places)
+        let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate)
+        let destinationPlaceMark = MKPlacemark(coordinate: destination)
+        
+        // request a direction
+        let directionRequest = MKDirections.Request()
+        
+        // define source and destination
+        directionRequest.source = MKMapItem(placemark: sourcePlaceMark)
+        directionRequest.destination = MKMapItem(placemark: destinationPlaceMark)
+        
+        // transportation type
+        directionRequest.transportType = .walking
+        
+        // calculate directions
+        let directions = MKDirections(request: directionRequest)
+        directions.calculate { (response, error) in
+            guard let directionResponse = response else {return}
+            // create route
+            let route = directionResponse.routes[0]
+            // draw the polyline
+            self.map.addOverlay(route.polyline, level: .aboveRoads)
             
-            let overlays = places.map { MKCircle(center: $0.coordinate, radius: 1000)}
-            mapView.addOverlays(overlays)
+            // defining the bounding map rect
+            let rect = route.polyline.boundingMapRect
+//            self.map.setRegion(MKCoordinateRegion(rect), animated: true)
+            self.map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
         }
-        
-        //MARK: - polyline method
-        func addPolyline() {
-            let coordinates = places.map {$0.coordinate}
-            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-            mapView.addOverlay(polyline)
-        }
-        
-        //MARK: - polygon method
-        func addPolygon() {
-            let coordinates = places.map {$0.coordinate}
-            let polyline = MKPolygon(coordinates: coordinates, count: coordinates.count)
-            mapView.addOverlay(polyline)
-        }
-        
-}
+    }
     
+}
 
-           }
+extension ViewController: MKMapViewDelegate {
+    //MARK: - add viewFor annotation method
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        if annotation is MKUserLocation {
+            return nil
+        }
+        
+//        let pinAnnotation = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+//        pinAnnotation.animatesDrop = true
+//        pinAnnotation.pinTintColor = #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)
+        
+        // add custom annotation with image
+        let pinAnnotation = map.dequeueReusableAnnotationView(withIdentifier: "droppablePin") ?? MKPinAnnotationView()
+        pinAnnotation.image = UIImage(named: "ic_place_2x")
+        pinAnnotation.canShowCallout = true
+        pinAnnotation.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+        return pinAnnotation
+    }
+    
+    //MARK: - callout accessory control tapped
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        let alertController = UIAlertController(title: "Your Place", message: "Welcome", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    //MARK: - render for overlay
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if overlay is MKCircle {
+            let rendrer = MKCircleRenderer(overlay: overlay)
+            rendrer.fillColor = UIColor.black.withAlphaComponent(0.5)
+            rendrer.strokeColor = UIColor.green
+            rendrer.lineWidth = 2
+            return rendrer
+        } else if overlay is MKPolyline {
+            let rendrer = MKPolylineRenderer(overlay: overlay)
+            rendrer.strokeColor = UIColor.blue
+            rendrer.lineWidth = 3
+            return rendrer
+        } else if overlay is MKPolygon {
+            let rendrer = MKPolygonRenderer(overlay: overlay)
+            rendrer.fillColor = UIColor.red.withAlphaComponent(0.6)
+            rendrer.strokeColor = UIColor.purple
+            rendrer.lineWidth = 2
+            return rendrer
+        }
+        return MKOverlayRenderer()
+    }
+}
