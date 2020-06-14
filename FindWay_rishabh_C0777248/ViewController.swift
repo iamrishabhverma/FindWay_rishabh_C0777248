@@ -8,12 +8,14 @@
 import UIKit
 import MapKit
 import CoreLocation
-class ViewController: UIViewController ,MKMapViewDelegate,CLLocationManagerDelegate{
+class ViewController: UIViewController ,CLLocationManagerDelegate{
 
     @IBOutlet weak var findmyway: UIButton!
     @IBOutlet weak var mapView: MKMapView!
     var locationManager = CLLocationManager()
     var destination: CLLocationCoordinate2D!
+    // create a places array
+    let places = Place.getPlaces()
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -109,8 +111,8 @@ class ViewController: UIViewController ,MKMapViewDelegate,CLLocationManagerDeleg
            
            mapView.removeOverlays(mapView.overlays)
                   
-                   let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate)
-        let destinationPlaceMark = MKPlacemark(coordinate: destination)
+                   let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate ,addressDictionary: nil)
+                   let destinationPlaceMark = MKPlacemark(coordinate: destination)
                 
                    // request a direction
                    let directionRequest = MKDirections.Request()
@@ -137,5 +139,50 @@ class ViewController: UIViewController ,MKMapViewDelegate,CLLocationManagerDeleg
                        self.mapView.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
            
        }
+        
+        extension ViewController: MKMapViewDelegate {
+            //MARK: - add viewFor annotation method
+            func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+                
+                if annotation is MKUserLocation {
+                    return nil
+                }
+                
+        //        let pinAnnotation = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+        //        pinAnnotation.animatesDrop = true
+        //        pinAnnotation.pinTintColor = #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)
+                
+                // add custom annotation with image
+                let pinAnnotation = mapView.dequeueReusableAnnotationView(withIdentifier: "droppablePin") ?? MKPinAnnotationView()
+                pinAnnotation.image = UIImage(named: "ic_place_2x")
+                pinAnnotation.canShowCallout = true
+                pinAnnotation.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+                return pinAnnotation
+            }
+        //MARK: - places method
+        /// add places function
+        func addPlaces() {
+            mapView.addAnnotations(places)
+            
+            let overlays = places.map { MKCircle(center: $0.coordinate, radius: 1000)}
+            mapView.addOverlays(overlays)
+        }
+        
+        //MARK: - polyline method
+        func addPolyline() {
+            let coordinates = places.map {$0.coordinate}
+            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+            mapView.addOverlay(polyline)
+        }
+        
+        //MARK: - polygon method
+        func addPolygon() {
+            let coordinates = places.map {$0.coordinate}
+            let polyline = MKPolygon(coordinates: coordinates, count: coordinates.count)
+            mapView.addOverlay(polyline)
+        }
+        
+}
+    
 }
 }

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A621E6FE2496889500BCD053 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = A621E6FD2496889500BCD053 /* Place.swift */; };
+		A621E70024968B4100BCD053 /* Places.plist in Resources */ = {isa = PBXBuildFile; fileRef = A621E6FF24968B4100BCD053 /* Places.plist */; };
 		A66F4F2D249121B80096DB8C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66F4F2C249121B80096DB8C /* AppDelegate.swift */; };
 		A66F4F2F249121B80096DB8C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66F4F2E249121B80096DB8C /* SceneDelegate.swift */; };
 		A66F4F31249121B80096DB8C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66F4F30249121B80096DB8C /* ViewController.swift */; };
@@ -35,6 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A621E6FD2496889500BCD053 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
+		A621E6FF24968B4100BCD053 /* Places.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Places.plist; sourceTree = "<group>"; };
 		A66F4F29249121B80096DB8C /* FindWay_rishabh_C0777248.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FindWay_rishabh_C0777248.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A66F4F2C249121B80096DB8C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A66F4F2E249121B80096DB8C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -106,6 +110,8 @@
 				A66F4F35249121B90096DB8C /* Assets.xcassets */,
 				A66F4F37249121B90096DB8C /* LaunchScreen.storyboard */,
 				A66F4F3A249121B90096DB8C /* Info.plist */,
+				A621E6FF24968B4100BCD053 /* Places.plist */,
+				A621E6FD2496889500BCD053 /* Place.swift */,
 			);
 			path = FindWay_rishabh_C0777248;
 			sourceTree = "<group>";
@@ -234,6 +240,7 @@
 			files = (
 				A66F4F39249121B90096DB8C /* LaunchScreen.storyboard in Resources */,
 				A66F4F36249121B90096DB8C /* Assets.xcassets in Resources */,
+				A621E70024968B4100BCD053 /* Places.plist in Resources */,
 				A66F4F34249121B80096DB8C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,6 +269,7 @@
 				A66F4F31249121B80096DB8C /* ViewController.swift in Sources */,
 				A66F4F2D249121B80096DB8C /* AppDelegate.swift in Sources */,
 				A66F4F2F249121B80096DB8C /* SceneDelegate.swift in Sources */,
+				A621E6FE2496889500BCD053 /* Place.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
