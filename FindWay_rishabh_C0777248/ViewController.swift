@@ -12,7 +12,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate {
     
     var locationManager = CLLocationManager()
     
-    var destination: CLLocationCoordinate2D!
+    var destination: CLLocationCoordinate2D?
 
     @IBOutlet weak var map: MKMapView!
     
@@ -49,21 +49,23 @@ class ViewController: UIViewController , CLLocationManagerDelegate {
         // long press gesture
         let uilpgr = UILongPressGestureRecognizer(target: self, action: #selector(addlongPressAnnotation))
         map.addGestureRecognizer(uilpgr)
+        //add pinchto zoom gesture
+             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(sender:)))
+                  view.addGestureRecognizer(pinch)
+            
+        
         
         // add double tap
         addDoubleTap()
         
         // add annotation for the places
-//        addPlaces()
+       addPlaces()
         
         // add polyline method
-//        addPolyline()
-        
-        // add polygon method
-//        addPolygon()
+       addPolyline()
         
     }
-    
+   
     //MARK: - places method
     /// add places function
     func addPlaces() {
@@ -154,21 +156,20 @@ class ViewController: UIViewController , CLLocationManagerDelegate {
         annotation.coordinate = coordinate
         map.addAnnotation(annotation)
         
-       destination = coordinate
+        destination = coordinate
     }
     
     func removePin() {
         for annotation in map.annotations {
             map.removeAnnotation(annotation)
         }
-//        map.removeAnnotations(map.annotations)
     }
     
     @IBAction func drawDirection(_ sender: UIButton) {
         map.removeOverlays(map.overlays)
-        
+    
         let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate)
-        let destinationPlaceMark = MKPlacemark(coordinate: destination)
+        let destinationPlaceMark = MKPlacemark(coordinate: destination!)
         
         // request a direction
         let directionRequest = MKDirections.Request()
@@ -195,32 +196,65 @@ class ViewController: UIViewController , CLLocationManagerDelegate {
             self.map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
         }
     }
+    @objc func handlePinch(sender: UIPinchGestureRecognizer) {
+       guard sender.view != nil else { return }
+       
+       if sender.state == .began || sender.state == .changed {
+           sender.view?.transform = (sender.view?.transform.scaledBy(x: sender.scale, y: sender.scale))!
+           sender.scale = 1.0
+       }
+}
     
+    @IBAction func drawDirectioncar(_ sender: UIButton) {
+        map.removeOverlays(map.overlays)
+                
+                let sourcePlaceMark = MKPlacemark(coordinate: locationManager.location!.coordinate)
+                let destinationPlaceMark = MKPlacemark(coordinate: destination!)
+                
+                // request a direction
+                let directionRequest = MKDirections.Request()
+                
+                // define source and destination
+                directionRequest.source = MKMapItem(placemark: sourcePlaceMark)
+                directionRequest.destination = MKMapItem(placemark: destinationPlaceMark)
+                
+                // transportation type
+                directionRequest.transportType = .automobile
+                
+                // calculate directions
+                let directions = MKDirections(request: directionRequest)
+                directions.calculate { (response, error) in
+                    guard let directionResponse = response else {return}
+                    // create route
+                    let route = directionResponse.routes[0]
+                    // draw the polyline
+                    self.map.addOverlay(route.polyline, level: .aboveRoads)
+                    
+                    // defining the bounding map rect
+                    let rect = route.polyline.boundingMapRect
+        //            self.map.setRegion(MKCoordinateRegion(rect), animated: true)
+                    self.map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
+                }
+    }
 }
 
-extension ViewController: MKMapViewDelegate {
-    //MARK: - add viewFor annotation method
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        
-        if annotation is MKUserLocation {
-            return nil
-        }
-        
-//        let pinAnnotation = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
-//        pinAnnotation.animatesDrop = true
-//        pinAnnotation.pinTintColor = #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)
-        
-        // add custom annotation with image
-        let pinAnnotation = map.dequeueReusableAnnotationView(withIdentifier: "droppablePin") ?? MKPinAnnotationView()
-        pinAnnotation.image = UIImage(named: "ic_place_2x")
-        pinAnnotation.canShowCallout = true
-        pinAnnotation.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-        return pinAnnotation
-    }
+ extension ViewController: MKMapViewDelegate {
+     //MARK: - add viewFor annotation method
+     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+         
+         if annotation is MKUserLocation {
+             return nil
+         }
+         let pinAnnotation = map.dequeueReusableAnnotationView(withIdentifier: "droppablePin") ?? MKPinAnnotationView()
+     //    pinAnnotation.image = UIImage(named: "ic_place_2x")
+         pinAnnotation.canShowCallout = true
+         pinAnnotation.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+         return pinAnnotation
+     }
     
     //MARK: - callout accessory control tapped
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        let alertController = UIAlertController(title: "Your Place", message: "Welcome", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Your Place", message: "This is your location!", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
         present(alertController, animated: true, completion: nil)
